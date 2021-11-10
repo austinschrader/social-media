@@ -1,0 +1,42 @@
+const bcrypt = require("bcryptjs");
+const jsonwebtoken = require("jsonwebtoken");
+const User = require("../../models/User");
+
+const { JWT_SECRET } = require("../../config");
+
+module.exports = {
+  Mutation: {
+    async register(
+      _,
+      { registerInput: { userName, email, password, confirmPassword } }
+    ) {
+      password = await bcrypt.hash(password, 12);
+
+      const newUser = new User({
+        userName,
+        email,
+        password,
+        createdAt: new Date().toISOString(),
+      });
+
+      const result = await newUser.save();
+
+      const token = jsonwebtoken.sign(
+        {
+          id: result.id,
+          userName: result.userName,
+          email: result.email,
+        },
+        JWT_SECRET,
+        { expiresIn: "1h" }
+      );
+
+      return {
+        ...result._doc,
+        id: result.id,
+        token,
+        tokenExpiration: 1,
+      };
+    },
+  },
+};
