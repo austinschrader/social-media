@@ -3,7 +3,10 @@ const jsonwebtoken = require("jsonwebtoken");
 const User = require("../../models/User");
 const { UserInputError } = require("apollo-server");
 
-const { validateRegisterInput } = require("../../utils/validators");
+const {
+  validateRegisterInput,
+  validateLoginInput,
+} = require("../../utils/validators");
 const { JWT_SECRET } = require("../../config");
 
 module.exports = {
