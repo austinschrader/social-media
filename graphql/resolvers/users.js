@@ -3,6 +3,7 @@ const jsonwebtoken = require("jsonwebtoken");
 const User = require("../../models/User");
 const { UserInputError } = require("apollo-server");
 
+const { validateRegisterInput } = require("../../utils/validators");
 const { JWT_SECRET } = require("../../config");
 
 module.exports = {
@@ -11,6 +12,17 @@ module.exports = {
       _,
       { registerInput: { userName, email, password, confirmPassword } }
     ) {
+      const { valid, errors } = validateRegisterInput(
+        userName,
+        email,
+        password,
+        confirmPassword
+      );
+
+      if (!valid) {
+        throw new UserInputError("Errors", { errors });
+      }
+
       const user = await User.findOne({ userName });
       if (user) {
         throw new UserInputError("User already exists", {
