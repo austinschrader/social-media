@@ -1,4 +1,4 @@
-import { AuthenticationError } from "apollo-server";
+const { AuthenticationError } = require("apollo-server");
 
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = "../config";
