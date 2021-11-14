@@ -9,8 +9,53 @@ const {
 } = require("../../utils/validators");
 const { JWT_SECRET } = require("../../config");
 
+function generateToken(user) {
+  return jsonwebtoken.sign(
+    {
+      id: user.id,
+      userName: user.userName,
+      email: user.email,
+    },
+    JWT_SECRET,
+    { expiresIn: "1h" }
+  );
+}
+
 module.exports = {
   Mutation: {
+    async login(_, { userName, password }) {
+      const { errors, valid } = validateLoginInput(userName, password);
+
+      if (!valid) {
+        throw new UserInputError("Errors", { errors });
+      }
+
+      const user = await User.findOne({ userName });
+
+      if (!user) {
+        errors.userName = "User not found";
+        throw new UserInputError("Invalid credentials", {
+          errors,
+        });
+      }
+      const isMatch = await bcrypt.compare(password, user.password);
+
+      if (!isMatch) {
+        errors.password = "Invalid credentials";
+        throw new UserInputError("Invalid credentials", {
+          errors,
+        });
+      }
+
+      const token = generateToken(user);
+
+      return {
+        ...user._doc,
+        id: user.id,
+        token,
+      };
+    },
+
     async register(
       _,
       { registerInput: { userName, email, password, confirmPassword } }
@@ -46,21 +91,12 @@ module.exports = {
 
       const result = await newUser.save();
 
-      const token = jsonwebtoken.sign(
-        {
-          id: result.id,
-          userName: result.userName,
-          email: result.email,
-        },
-        JWT_SECRET,
-        { expiresIn: "1h" }
-      );
+      const token = generateToken(result);
 
       return {
         ...result._doc,
         id: result.id,
         token,
-        tokenExpiration: 1,
       };
     },
   },
