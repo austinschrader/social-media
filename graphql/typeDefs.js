@@ -11,7 +11,6 @@ module.exports = gql`
     id: ID!
     email: String!
     token: String!
-    tokenExpiration: String!
     userName: String!
     createdAt: String!
   }
