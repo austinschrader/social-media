@@ -7,7 +7,11 @@ const resolvers = require("./graphql/resolvers");
 const { MONGODB } = require("./config.js");
 
 async function startApolloServer(typeDefs, resolvers) {
-  const server = new ApolloServer({ typeDefs, resolvers });
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: ({ req }) => ({ req }),
+  });
   const { url } = await server.listen({ port: 5000 });
   console.log(`Server ready at ${url}`);
 }
