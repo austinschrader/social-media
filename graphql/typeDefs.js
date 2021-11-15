@@ -5,17 +5,17 @@ module.exports = gql`
     id: ID!
     body: String!
     createdAt: String!
-    userName: String!
+    username: String!
   }
   type User {
     id: ID!
     email: String!
     token: String!
-    userName: String!
+    username: String!
     createdAt: String!
   }
   input RegisterInput {
-    userName: String!
+    username: String!
     password: String!
     confirmPassword: String!
     email: String!
@@ -23,12 +23,10 @@ module.exports = gql`
   type Query {
     getPosts: [Post]
     getPost(postId: ID!): Post
-    createPost(body: String!): Post
-    deletePost(postId: ID!): String!
   }
   type Mutation {
     register(registerInput: RegisterInput): User!
-    login(userName: String!, password: String!): User!
+    login(username: String!, password: String!): User!
     createPost(body: String!): Post!
     deletePost(postId: ID!): String!
   }
